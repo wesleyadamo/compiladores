@@ -28,7 +28,13 @@ public class Scanner {
 		example.put("<=", "operador menor ou igual");
 		example.put(">=", "operador maior ou igual");
 		example.put("!=", "operador diferente ");
-
+		example.put("+", "operador de soma");
+		example.put("-", "operador de subtração");
+		example.put("/", "operador de divisão");
+		example.put("*", "operador de multiplicação");
+		example.put("**", "operador de exponeciação");
+		example.put("++", "operador de incremento ");
+		example.put("--", "operador de decremento");
 	}
 
 	public static void tabelaSimbolos(String str) {
@@ -38,7 +44,7 @@ public class Scanner {
 
 		} else {
 			example.put(str, "id");
-			strFinal.append("< id , " + str + " >");
+			strFinal.append("< id , " + str + " >\n");
 
 		}
 
@@ -61,22 +67,18 @@ public class Scanner {
 
 			StringBuffer str = new StringBuffer();
 			int estado = 1;
-			
-			System.out.println(b.length);
-			for (i = 0; i < b.length-1; i++) {
 
-				System.out.println("aqui b " + i);
+			for (i = 0; i < b.length - 1; i++) {
+
 
 				switch (estado) {
 				case 1: // identificador ou palavra reservada
 					if (Character.isLetter(b[i])) {
 
-						System.out.println("entrou com: " + b[i]);
 
 						// enquanto caracter ou número
 						while (Character.isLetterOrDigit(b[i])) {
 							str.append(b[i]);
-							System.out.println(b[i]);
 							i++;
 						}
 
@@ -87,15 +89,109 @@ public class Scanner {
 						estado = 1;
 
 					} else {
-						System.out.println("entrou aqui");
 						estado = 2;
 						i--;
 					} // ativa próximo diagrama
 
 					break;
 				case 3:
+					
+					boolean found = false;
+					if(b[i] == '+') {
+						str.append('+');
+						if(b[++i] == '+') str.append('+');
+						else --i;
+						
+						tabelaSimbolos(str.toString());
+						str.delete(0, str.length());
+						estado = 1;
+						found = true;
+						break;
+						
+							
+					}
+					
+					
+					if(b[i] == '-') {
+						str.append('-');
+						if(b[++i] == '-') str.append('-');
+						else --i;
+						
+						tabelaSimbolos(str.toString());
+						str.delete(0, str.length());
+						estado = 1;
+						found = true;
+						break;
+						
+							
+					}
+					
+					
+					if(b[i] == '*') {
+						str.append('*');
+						if(b[++i] == '*') str.append('*');
+						else --i;
+						
+						tabelaSimbolos(str.toString());
+						str.delete(0, str.length());
+						estado = 1;
+						found = true;
+						break;
+						
+							
+					}
+						
+					if(b[i] == '/') {
+						
+						
+						if(b[++i]=='/') {
+							while((int)b[i]!=10) {
+								i++;
+							    
+							} 
+						} else {
+						
+							tabelaSimbolos(str.toString());
+							str.delete(0, str.length());
+							estado = 1;
+							found = true;
+							--i;
+							break;
+						}
+						
+							
+					}
+					
+					
+					
+					if(!found) {
+						--i;
+						estado++;
+					}
+					
+					
+					break;
+					
+				case 4:
+						if(Character.isDigit(b[i])) {
+							while(Character.isDigit(b[i])) {
+								str.append(b[i]);
+								i++;
+							}
+							
+							strFinal.append("< num , " + str.toString()+ " >\n");
+							str.delete(0, str.length());
+						    estado = 1;
+						    i--;
+						    break;
+						}
+						
+						estado++;
+						--i;
+						break;
+			
+				case 5:
 					if ((int) b[i] == 32) {
-						System.out.println("entrou no if 3" + b[i] + "  " + i);
 						// diagrama de espaço
 						while ((int) b[i] == ' ' || (int) b[i] == 10 || (int) b[i] == 12) {
 							i++;
@@ -103,117 +199,94 @@ public class Scanner {
 						i--;
 						estado = 1;
 					}
+
 					break;
 
 				case 2: // atributos relacionais
-					
-					boolean found = false;
+
+				    found = false;
 					if (b[i] == ';' || b[i] == '{' || b[i] == '}' || b[i] == '(' || b[i] == ')') {
 
 						tabelaSimbolos(str.append(b[i]).toString());
 						str.delete(0, str.length());
 						found = true;
 
-					} else 
-						if (b[i] == '=') 
-						{
-							str.append("=");
+					} else if (b[i] == '=') {
+						str.append("=");
 
-							i++;
-							if(b[i] == '=') str.append("=");
-							if(b[i] == '>') str.append(">");
-							
-							
-							
+						i++;
+						if (b[i] == '=')
+							str.append("=");
+						if (b[i] == '>')
+							str.append(">");
+
+						tabelaSimbolos(str.toString());
+						if (str.length() == 1)
+							i--; // caso de =
+						str.delete(0, str.length());
+						estado = 1;
+						found = true;
+						break;
+					}
+
+					if (b[i] == '!')
+						if (b[++i] == '=') {
+							str.append("!=");
 							tabelaSimbolos(str.toString());
-							System.out.println(str.toString());
-							if(str.length()==1) i--;  // caso de = 
-							System.out.println( i);
 							str.delete(0, str.length());
 							estado = 1;
 							found = true;
 							break;
+						} else {
+							strFinal.append("Erro léxico em !");
+							i--;
 						}
-					
-						if(b[i]=='!')
-							if(b[++i]=='=') 
-							{
-								str.append("!=");
-								tabelaSimbolos(str.toString());
-								str.delete(0, str.length());
-								estado = 1;
-								found = true;
-								break;
-							}   else 
-								{
-									strFinal.append("Erro léxico em !");
-									i--;
-								}	
-							
-						
-						if(b[i]=='<') 
-							if (b[++i]=='=')
-							{
-								str.append("<=");
-								tabelaSimbolos(str.toString());
-								str.delete(0, str.length());
-								estado = 1;
-								found = true;
-								break;
-							} else  {	
-								str.append('<');
-								tabelaSimbolos(str.toString());
-								str.delete(0, str.length());
-								--i;
-								found = true;
-							
-							}						
-						
-						if(b[i]=='>' ) if( b[++i]=='=')
-						{
+
+					if (b[i] == '<')
+						if (b[++i] == '=') {
+							str.append("<=");
+							tabelaSimbolos(str.toString());
+							str.delete(0, str.length());
+							estado = 1;
+							found = true;
+							break;
+						} else {
+							str.append('<');
+							tabelaSimbolos(str.toString());
+							str.delete(0, str.length());
+							--i;
+							found = true;
+
+						}
+
+					if (b[i] == '>')
+						if (b[++i] == '=') {
 							str.append(">=");
 							tabelaSimbolos(str.toString());
 							str.delete(0, str.length());
 							estado = 1;
 							found = true;
 							break;
-						} else   {
+						} else {
 							str.append('>');
 							tabelaSimbolos(str.toString());
 							str.delete(0, str.length());
 							--i;
 							found = true;
-							
-						}
-						
-						
 
-						if(!found) {
-							estado++;
-							i--;
-							
 						}
-						
-					
-					
+
+					if (!found) {
+						estado++;
+						i--;
+
+					}
+
 					break;
 
 				default:
 					break;
 				}
-
-				/*
-				 * if ((int) b[i] == 32 || i+1 == b.length) {
-				 * 
-				 * 
-				 * if(str.toString().length() > 0) { tabelaSimbolos(str.toString());
-				 * str.delete(0, str.length()); continue; }
-				 * 
-				 * 
-				 * } else { str.append(b[i]);
-				 * 
-				 * }
-				 */
 
 			}
 
