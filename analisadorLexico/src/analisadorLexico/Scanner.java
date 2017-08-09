@@ -1,84 +1,92 @@
 package analisadorLexico;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Scanner {
 
-	static Map<String, String> example = new HashMap<String, String>();
+	static Map<String, Token> tabelaSimbolos = new HashMap<String, Token>();
 	static StringBuffer strFinal = new StringBuffer();
 
-	public static void adicionarTabela() {
-		example.put("int", "int");
-		example.put("{", "pr {");
-		example.put(";", "pr ;");
-		example.put("}", "pr }");
-		example.put("(", "pr (");
-		example.put(")", "pr )");
-		example.put("while", "pr while");
-		example.put("for", "pr for");
-		example.put("if", "pr if");
-		example.put("else", "pr else");
-		example.put("=", "operador de atribuição");
-		example.put("==", "operador de igualdade");
-		example.put(">", "operador maior que");
-		example.put("<", "menor que");
-		example.put("<=", "operador menor ou igual");
-		example.put(">=", "operador maior ou igual");
-		example.put("!=", "operador diferente ");
-		example.put("+", "operador de soma");
-		example.put("-", "operador de subtração");
-		example.put("/", "operador de divisão");
-		example.put("*", "operador de multiplicação");
-		example.put("**", "operador de exponeciação");
-		example.put("++", "operador de incremento ");
-		example.put("--", "operador de decremento");
+	public static void criarTabela() {
+		tabelaSimbolos.put("int", new Token("int", "int"));
+		tabelaSimbolos.put("{", new Token("{", "{"));
+		tabelaSimbolos.put("}", new Token("}", "}"));
+		tabelaSimbolos.put(";", new Token(";", ";"));
+		tabelaSimbolos.put("(", new Token("(", "("));
+		tabelaSimbolos.put(")", new Token(")", ")"));
+		tabelaSimbolos.put("while", new Token("while", "palavra reservada while"));
+		tabelaSimbolos.put("for", new Token("for", "palavra reservada for"));
+		tabelaSimbolos.put("if", new Token("if", "palavra reservada if"));
+		tabelaSimbolos.put("else", new Token("else", "palavra reservada else"));
+		tabelaSimbolos.put("=", new Token("operador de atribuição", "="));
+		tabelaSimbolos.put("==", new Token("operador de igualdade", "=="));
+		tabelaSimbolos.put(">", new Token("operador maior que", ">"));
+		tabelaSimbolos.put("<", new Token("operador menor que", "<"));
+		tabelaSimbolos.put("<=", new Token("operador menor ou igual", "<="));
+		tabelaSimbolos.put(">=", new Token("operador maior ou igual", ">="));
+		tabelaSimbolos.put("!=", new Token("operador diferente que ", "!="));
+		tabelaSimbolos.put("+", new Token("operador de soma", "+"));
+		tabelaSimbolos.put("-", new Token("operador de subtração", "-"));
+		tabelaSimbolos.put("/", new Token("operador de divisão", "/"));
+		tabelaSimbolos.put("*", new Token("operador de multiplicação", "*"));
+		tabelaSimbolos.put("**", new Token("operador de exponenciação", "**"));
+		tabelaSimbolos.put("++", new Token("operador de incremento", "++"));
+		tabelaSimbolos.put("--", new Token("operador de decremento", "--"));
+		tabelaSimbolos.put("main", new Token("main", "palavra reservada main"));
 	}
 
 	public static void tabelaSimbolos(String str) {
 
-		if (example.containsKey(str)) {
-			strFinal.append("<'" + str + "' , " + example.get(str) + " >\n");
+		if (tabelaSimbolos.containsKey(str)) {
+			strFinal.append("< " + tabelaSimbolos.get(str).getNome() + " , " + tabelaSimbolos.get(str).getAtributo() + " >  ");
 
 		} else {
-			example.put(str, "id");
-			strFinal.append("< id , " + str + " >\n");
+			tabelaSimbolos.put(str, new Token("identificador", str));
+			strFinal.append("< identificador, " + str + " >  ");
 
 		}
 
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+		char[] aux = null;
+		
 		try {
 
-			adicionarTabela();
+			criarTabela();
 
-			File arquivo = new File("teste.txt");
+			File arquivo = new File("entrada.txt");
 			FileReader fr = new FileReader(arquivo);
-			char[] b = new char[(int) arquivo.length()];
+			char[] buffer = new char[(int) arquivo.length()];
 
 			int i = 0;
-			while ((fr.read(b)) != -1) {
-				// System.out.println(b);
-
+			while ((fr.read(buffer)) != -1) {
 			}
+
+			aux = buffer;
 
 			StringBuffer str = new StringBuffer();
 			int estado = 1;
 
-			for (i = 0; i < b.length - 1; i++) {
+			for (i = 0; i < buffer.length - 1; i++) {
 
-
+				System.out.println(buffer[i]);
 				switch (estado) {
 				case 1: // identificador ou palavra reservada
-					if (Character.isLetter(b[i])) {
-
+					if (Character.isLetter(buffer[i])) {
 
 						// enquanto caracter ou número
-						while (Character.isLetterOrDigit(b[i])) {
-							str.append(b[i]);
+						while (Character.isLetterOrDigit(buffer[i])) {
+							str.append(buffer[i]);
 							i++;
 						}
 
@@ -94,130 +102,24 @@ public class Scanner {
 					} // ativa próximo diagrama
 
 					break;
-				case 3:
-					
-					boolean found = false;
-					if(b[i] == '+') {
-						str.append('+');
-						if(b[++i] == '+') str.append('+');
-						else --i;
-						
-						tabelaSimbolos(str.toString());
-						str.delete(0, str.length());
-						estado = 1;
-						found = true;
-						break;
-						
-							
-					}
-					
-					
-					if(b[i] == '-') {
-						str.append('-');
-						if(b[++i] == '-') str.append('-');
-						else --i;
-						
-						tabelaSimbolos(str.toString());
-						str.delete(0, str.length());
-						estado = 1;
-						found = true;
-						break;
-						
-							
-					}
-					
-					
-					if(b[i] == '*') {
-						str.append('*');
-						if(b[++i] == '*') str.append('*');
-						else --i;
-						
-						tabelaSimbolos(str.toString());
-						str.delete(0, str.length());
-						estado = 1;
-						found = true;
-						break;
-						
-							
-					}
-						
-					if(b[i] == '/') {
-						
-						
-						if(b[++i]=='/') {
-							while((int)b[i]!=10) {
-								i++;
-							    
-							} 
-						} else {
-						
-							tabelaSimbolos(str.toString());
-							str.delete(0, str.length());
-							estado = 1;
-							found = true;
-							--i;
-							break;
-						}
-						
-							
-					}
-					
-					
-					
-					if(!found) {
-						--i;
-						estado++;
-					}
-					
-					
-					break;
-					
-				case 4:
-						if(Character.isDigit(b[i])) {
-							while(Character.isDigit(b[i])) {
-								str.append(b[i]);
-								i++;
-							}
-							
-							strFinal.append("< num , " + str.toString()+ " >\n");
-							str.delete(0, str.length());
-						    estado = 1;
-						    i--;
-						    break;
-						}
-						
-						estado++;
-						--i;
-						break;
-			
-				case 5:
-					if ((int) b[i] == 32) {
-						// diagrama de espaço
-						while ((int) b[i] == ' ' || (int) b[i] == 10 || (int) b[i] == 12) {
-							i++;
-						}
-						i--;
-						estado = 1;
-					}
-
-					break;
-
 				case 2: // atributos relacionais
 
-				    found = false;
-					if (b[i] == ';' || b[i] == '{' || b[i] == '}' || b[i] == '(' || b[i] == ')') {
+					boolean found = false;
+					if (buffer[i] == ';' || buffer[i] == '{' || buffer[i] == '}' || buffer[i] == '(' || buffer[i] == ')') {
 
-						tabelaSimbolos(str.append(b[i]).toString());
+						tabelaSimbolos(str.append(buffer[i]).toString());
 						str.delete(0, str.length());
 						found = true;
+						estado = 1;
+						break;
 
-					} else if (b[i] == '=') {
+					} else if (buffer[i] == '=') {
 						str.append("=");
 
 						i++;
-						if (b[i] == '=')
+						if (buffer[i] == '=')
 							str.append("=");
-						if (b[i] == '>')
+						if (buffer[i] == '>')
 							str.append(">");
 
 						tabelaSimbolos(str.toString());
@@ -229,8 +131,8 @@ public class Scanner {
 						break;
 					}
 
-					if (b[i] == '!')
-						if (b[++i] == '=') {
+					if (buffer[i] == '!')
+						if (buffer[++i] == '=') {
 							str.append("!=");
 							tabelaSimbolos(str.toString());
 							str.delete(0, str.length());
@@ -242,8 +144,8 @@ public class Scanner {
 							i--;
 						}
 
-					if (b[i] == '<')
-						if (b[++i] == '=') {
+					if (buffer[i] == '<')
+						if (buffer[++i] == '=') {
 							str.append("<=");
 							tabelaSimbolos(str.toString());
 							str.delete(0, str.length());
@@ -256,11 +158,13 @@ public class Scanner {
 							str.delete(0, str.length());
 							--i;
 							found = true;
+							estado = 1;
+							break;
 
 						}
 
-					if (b[i] == '>')
-						if (b[++i] == '=') {
+					if (buffer[i] == '>')
+						if (buffer[++i] == '=') {
 							str.append(">=");
 							tabelaSimbolos(str.toString());
 							str.delete(0, str.length());
@@ -273,6 +177,8 @@ public class Scanner {
 							str.delete(0, str.length());
 							--i;
 							found = true;
+							estado = 1;
+							break;
 
 						}
 
@@ -283,6 +189,118 @@ public class Scanner {
 					}
 
 					break;
+				case 3:
+
+					found = false;
+					if (buffer[i] == '+') {
+						str.append('+');
+						if (buffer[++i] == '+')
+							str.append('+');
+						else
+							--i;
+
+						tabelaSimbolos(str.toString());
+						str.delete(0, str.length());
+						estado = 1;
+						found = true;
+						break;
+
+					}
+
+					if (buffer[i] == '-') {
+						str.append('-');
+						if (buffer[++i] == '-')
+							str.append('-');
+						else
+							--i;
+
+						tabelaSimbolos(str.toString());
+						str.delete(0, str.length());
+						estado = 1;
+						found = true;
+						break;
+
+					}
+
+					if (buffer[i] == '*') {
+						str.append('*');
+						if (buffer[++i] == '*')
+							str.append('*');
+						else
+							--i;
+
+						tabelaSimbolos(str.toString());
+						str.delete(0, str.length());
+						estado = 1;
+						found = true;
+						break;
+
+					}
+
+					if (buffer[i] == '/') {
+
+						if (buffer[++i] == '/') {
+							while ((int) buffer[i] != 10) {
+								i++;
+
+							}
+						} else {
+
+							tabelaSimbolos(str.toString());
+							str.delete(0, str.length());
+							estado = 1;
+							found = true;
+							--i;
+							break;
+						}
+
+					}
+
+					if (!found) {
+						--i;
+						estado++;
+					}
+
+					break;
+
+				case 4: // reconhecimento de número inteiro
+					if (Character.isDigit(buffer[i])) {
+						while (Character.isDigit(buffer[i])) {
+							str.append(buffer[i]);
+							i++;
+						}
+
+						strFinal.append("< num , " + str.toString() + " >\n");
+						str.delete(0, str.length());
+						estado = 1;
+						i--;
+						break;
+					}
+
+					estado++;
+					--i;
+					break;
+
+				case 5: // reconhecimento de espaço, /n e começo de linha
+					if ((int) buffer[i] == 32 || (int) buffer[i] == 10) {
+						
+						while ((int) buffer[i] == ' ' || (int) buffer[i] == 10 || (int) buffer[i] == 12) {
+							i++;
+						}
+						i--;
+						estado = 1;
+					} else {
+						--i;
+						estado++;
+						break;
+					}
+
+					break;
+				
+				case 6 : 
+					strFinal.append("erro léxico: "+ buffer[i]+"   ");
+					estado =1;
+					break;
 
 				default:
 					break;
@@ -290,11 +308,20 @@ public class Scanner {
 
 			}
 
-		} catch (Exception e) {
-			// TODO: handle exception
+		} catch (Exception e) {		}
 
-			System.out.println(e.getMessage());
-		}
+		OutputStream os = new FileOutputStream("saida.txt");
+		OutputStreamWriter osw = new OutputStreamWriter(os);
+		BufferedWriter bw = new BufferedWriter(osw);
+
+		bw.write("Entrada\n===========================================================================\n"
+				+ String.copyValueOf(aux));
+		bw.write("\n==========================================================================\n");
+		bw.write("Saída");
+		bw.write("\n==========================================================================\n");
+		bw.write(strFinal.toString());
+
+		bw.close();
 
 		System.out.println(strFinal.toString());
 

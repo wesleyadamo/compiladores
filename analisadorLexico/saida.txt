@@ -1,0 +1,37 @@
+Entrada
+===========================================================================
+int main ()
+{float cos, x, n, term, eps, alt;
+// compute the cosine of x to within tolerance eps
+// use an alternating series
+x = 3.14159;
+eps = 0.1;
+n = 1;
+cos = 1;
+term = 1;
+alt = -1;
+while (term>eps)
+&;
+{
+term = term * x * x / n / (n+1);
+cos = cos + alt * term;
+alt = -alt;
+n = n + 2;
+}
+}
+    }
+
+==========================================================================
+Saída
+==========================================================================
+< int , int >  < main , palavra reservada main >  < ( , ( >  < ) , ) >  < { , { >  < identificador, float >  < identificador, cos >  erro léxico: ,   < identificador, x >  erro léxico: ,   < identificador, n >  erro léxico: ,   < identificador, term >  erro léxico: ,   < identificador, eps >  erro léxico: ,   < identificador, alt >  < ; , ; >  < identificador , x >  < operador de atribuição , = >  < num , 3 >
+erro léxico: .   < num , 14159 >
+< ; , ; >  < identificador , eps >  < operador de atribuição , = >  < num , 0 >
+erro léxico: .   < num , 1 >
+< ; , ; >  < identificador , n >  < operador de atribuição , = >  < num , 1 >
+< ; , ; >  < identificador , cos >  < operador de atribuição , = >  < num , 1 >
+< ; , ; >  < identificador , term >  < operador de atribuição , = >  < num , 1 >
+< ; , ; >  < identificador , alt >  < operador de atribuição , = >  < operador de subtração , - >  < num , 1 >
+< ; , ; >  < while , palavra reservada while >  < ( , ( >  < identificador , term >  < operador maior que , > >  < identificador , eps >  < ) , ) >  erro léxico: &   < ; , ; >  < { , { >  < identificador , term >  < operador de atribuição , = >  < identificador , term >  < operador de multiplicação , * >  < identificador , x >  < operador de multiplicação , * >  < identificador , x >  < identificador,  >  < identificador , n >  < identificador ,  >  < ( , ( >  < identificador , n >  < operador de soma , + >  < num , 1 >
+< ) , ) >  < ; , ; >  < identificador , cos >  < operador de atribuição , = >  < identificador , cos >  < operador de soma , + >  < identificador , alt >  < operador de multiplicação , * >  < identificador , term >  < ; , ; >  < identificador , alt >  < operador de atribuição , = >  < operador de subtração , - >  < identificador , alt >  < ; , ; >  < identificador , n >  < operador de atribuição , = >  < identificador , n >  < operador de soma , + >  < num , 2 >
+< ; , ; >  < } , } >  < } , } >  < } , } >  
